@@ -1,32 +1,118 @@
-modelSum <- function(models, model.names){
-  m <- m2 <- rows <- pval <- modnames <- list()
+modelSum <- function(models, model.names, type="OLS"){
+# OLS FUNCTION -----------------
+if (type=="OLS"){
+  m <- m2 <- rows <- pval <- modnames <- mse <- list()
   for (i in 1:length(models)){
     pval[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,4]) 
     m[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,1])
     rows[[i]] <- dim(m[[i]])[1]
     names(m[[i]]) <- "Estimate"
   }
-  m
   for (i in 1:length(m)){
     m[[i]]$names <- rownames(m[[i]])
     m2[[i]] <-
-          data.frame(
-            "Est"=m[[i]][,"Estimate"], 
-            "Sig"=paste(
-              ifelse(pval[[i]]<.001, "***",
-              ifelse(pval[[i]]<.01 & pval[[i]]>=.001, "**",
-              ifelse(pval[[i]]<.05 & pval[[i]]>=.01, "*", "")))),
-            "names"=m[[i]]$names)
+      data.frame(
+        "Est"=round(m[[i]][,"Estimate"],5), 
+        "Sig"=paste(
+          ifelse(pval[[i]]<.001, "***",
+                 ifelse(pval[[i]]<.01 & pval[[i]]>=.001, "**",
+                        ifelse(pval[[i]]<.05 & pval[[i]]>=.01, "*", "")))),
+        "names"=m[[i]]$names)
   }
-  m2
   options(warn=-1)
   # Reduce repeats the function provided over all the elements of m2
   merged <- Reduce(function(...) merge(..., by="names", all=TRUE), m2)
   names(merged) <- c("Variables", rep(model.names, each=2))
   merged[,c(seq(3, length.out=length(model.names), by=2))] <- sapply(merged[,c(seq(3, length.out=length(model.names), by=2))], as.character)
   merged[is.na(merged)] <- ""
+  # Significance code
   sigStatement <- paste("Sig Levels: *** < 0.001, ** < 0.01, * < 0.05")
-  # summaryStatement <- paste("MSE") # report MSE and misclafficiation rates
+  # To report the MSE of Each Model
+  for (i in 1:length(m)){
+    mse[[i]] <- round((1/(models[[i]]$df.residual+models[[i]]$rank))*(sum(models[[i]]$residuals^2)),8)
+  }
+  summaryStatement <- paste("MSE of", model.names, "=", mse)
+  # Variable of Interest
   # VariableInt <-  # Report effect size of variable of interest for each model
-  print(list(merged,sigStatement))
+  print(list("Table"=merged,"Sig"=sigStatement,"MSE"=summaryStatement))
+  }
+# LOGIT FUNCTION ----------------
+if (type=="Logit"){
+    m <- m2 <- rows <- pval <- modnames <- mis <- nameslist <- list()
+  for (i in 1:length(models)){
+    pval[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,4]) 
+    m[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,1])
+    rows[[i]] <- dim(m[[i]])[1]
+    names(m[[i]]) <- "Estimate"
+  }
+  for (i in 1:length(m)){
+    m[[i]]$names <- rownames(m[[i]])
+    m2[[i]] <-
+      data.frame(
+        "Est"=round(exp(m[[i]][,"Estimate"]),4), # exponentiating estimate -> Odds Ratio
+        "Lower"=round(exp(confint(models[[i]])[,1]),4),
+        "Upper"=round(exp(confint(models[[i]])[,2]),4),
+        "names"=m[[i]]$names)
+  }
+  options(warn=-1)
+  # Reduce repeats the function provided over all the elements of m2
+  merged <- Reduce(function(...) merge(..., by="names", all=TRUE), m2)
+  for (i in 1:length(model.names)){
+    nameslist[[i]] <- cbind(model.names[[i]],"Lower","Upper")
+  }
+  nameslist <- unlist(nameslist)
+  names(merged) <- c("Variable",nameslist)
+  merged[,c(seq(3, length.out=length(model.names), by=2))] <- sapply(merged[,c(seq(3, length.out=length(model.names), by=2))], as.character)
+  merged[is.na(merged)] <- ""
+  # To report the Misclassification of Each Model
+  for (i in 1:length(m)){
+    mis[[i]] <- 1-sum(diag(table(models[[i]]$y,round(models[[i]]$fitted.values))))/length(models[[i]]$y)
+  }
+  summaryStatement <- paste("Misclassification Rate of", model.names, "=", mis)
+  print(list("Table"=merged,"Misclassification"=summaryStatement))
+  }
+# LOG FUNCTION
+if (type=="Log"){
+  m <- m2 <- rows <- pval <- modnames <- mis <- nameslist <- list()
+  for (i in 1:length(models)){
+    pval[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,4]) 
+    m[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,1])
+    rows[[i]] <- dim(m[[i]])[1]
+    names(m[[i]]) <- "Estimate"
+  }
+  for (i in 1:length(m)){
+    m[[i]]$names <- rownames(m[[i]])
+    m2[[i]] <-
+      data.frame(
+        "Est"=round(exp(m[[i]][,"Estimate"]),4), # exponentiating estimate -> Multiplicity Factor
+        "Lower"=round(exp(confint(models[[i]])[,1]),4),
+        "Upper"=round(exp(confint(models[[i]])[,2]),4),
+        "names"=m[[i]]$names)
+  }
+  options(warn=-1)
+  # Reduce repeats the function provided over all the elements of m2
+  merged <- Reduce(function(...) merge(..., by="names", all=TRUE), m2)
+  for (i in 1:length(model.names)){
+    nameslist[[i]] <- cbind(model.names[[i]],"Lower","Upper")
+  }
+  nameslist <- unlist(nameslist)
+  names(merged) <- c("Variable",nameslist)
+  merged[,c(seq(3, length.out=length(model.names), by=2))] <- sapply(merged[,c(seq(3, length.out=length(model.names), by=2))], as.character)
+  merged[is.na(merged)] <- ""
+  # To report the Misclassification of Each Model
+  for (i in 1:length(m)){
+    mis[[i]] <- 1-sum(diag(table(models[[i]]$y,round(models[[i]]$fitted.values))))/length(models[[i]]$y)
+  }
+  summaryStatement <- paste("Misclassification Rate of", model.names, "=", mis)
+  print(list("Table"=merged,"Misclassification"=summaryStatement))
+  }
+# ANOVA/ANCOVA
+if (type=="ANOVA"){
+  statement <- paste("Being Implemented")
+  print(statement)
+  }
+if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") {
+  statement <- paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.")
+  print(statement)
+  }
 }
