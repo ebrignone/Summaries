@@ -71,7 +71,7 @@ if (type=="Logit"){
   summaryStatement <- paste("Misclassification Rate of", model.names, "=", mis)
   print(list("Table"=merged,"Misclassification"=summaryStatement))
   }
-# LOG FUNCTION
+# LOG FUNCTION -------------
 if (type=="Log"){
   m <- m2 <- rows <- pval <- modnames <- mis <- nameslist <- list()
   for (i in 1:length(models)){
@@ -106,11 +106,12 @@ if (type=="Log"){
   summaryStatement <- paste("Misclassification Rate of", model.names, "=", mis)
   print(list("Table"=merged,"Misclassification"=summaryStatement))
   }
-# ANOVA/ANCOVA
+# ANOVA/ANCOVA ---------------
 if (type=="ANOVA"){
   statement <- paste("Being Implemented")
   print(statement)
   }
+# Not Supported ---------------
 if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") {
   statement <- paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.")
   print(statement)
