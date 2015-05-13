@@ -31,7 +31,7 @@ if (type=="OLS"){
   for (i in 1:length(m)){
     mse[[i]] <- round((1/(models[[i]]$df.residual+models[[i]]$rank))*(sum(models[[i]]$residuals^2)),8)
   }
-  summaryStatement <- paste("MSE of", model.names, "=", mse)
+  summaryStatement <- paste("Mean Squared Error of", model.names, "=", mse)
   # Variable of Interest
   # VariableInt <-  # Report effect size of variable of interest for each model
   print(list("Table"=merged,"Sig"=sigStatement,"MSE"=summaryStatement))
@@ -99,12 +99,12 @@ if (type=="Log"){
   names(merged) <- c("Variable",nameslist)
   merged[,c(seq(3, length.out=length(model.names), by=2))] <- sapply(merged[,c(seq(3, length.out=length(model.names), by=2))], as.character)
   merged[is.na(merged)] <- ""
-  # To report the Misclassification of Each Model
+  # To report the MSE of each Model
   for (i in 1:length(m)){
-    mis[[i]] <- 1-sum(diag(table(models[[i]]$y,round(models[[i]]$fitted.values))))/length(models[[i]]$y)
+    mse[[i]] <- round((1/(models[[i]]$df.residual+models[[i]]$rank))*(sum(models[[i]]$residuals^2)),8)
   }
-  summaryStatement <- paste("Misclassification Rate of", model.names, "=", mis)
-  print(list("Table"=merged,"Misclassification"=summaryStatement))
+  summaryStatement <- paste("Mean Squared Error of", model.names, "=", mse)
+  print(list("Table"=merged,"MSE"=summaryStatement))
   }
 # ANOVA/ANCOVA ---------------
 if (type=="ANOVA"){
