@@ -73,7 +73,7 @@ if (type=="Logit"){
   }
 # LOG FUNCTION -------------
 if (type=="Log"){
-  m <- m2 <- rows <- pval <- modnames <- mis <- nameslist <- list()
+  m <- m2 <- rows <- pval <- modnames <- mse <- nameslist <- list()
   for (i in 1:length(models)){
     pval[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,4]) 
     m[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,1])
