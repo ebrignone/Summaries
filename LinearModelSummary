@@ -1,4 +1,6 @@
 modelSum <- function(models, model.names, type="OLS"){
+  if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") 
+    stop(cat(paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.","\n","Types Supported: OLS, Logit, Log, ANOVA.")))
 # OLS FUNCTION -----------------
 if (type=="OLS"){
   m <- m2 <- rows <- pval <- modnames <- mse <- list()
@@ -109,11 +111,6 @@ if (type=="Log"){
 # ANOVA/ANCOVA ---------------
 if (type=="ANOVA"){
   statement <- paste("Being Implemented")
-  print(statement)
-  }
-# Not Supported ---------------
-if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") {
-  statement <- cat(paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.","\n","Types Supported: OLS, Logit, Log, ANOVA."))
   print(statement)
   }
 }
