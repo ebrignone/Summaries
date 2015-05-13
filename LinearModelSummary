@@ -113,7 +113,7 @@ if (type=="ANOVA"){
   }
 # Not Supported ---------------
 if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") {
-  statement <- paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.")
+  statement <- cat(paste("The", type, "method is not supported. Yet. Let me know you want it @ t.barrett@aggiemail.usu.edu.","\n","Types Supported: OLS, Logit, Log, ANOVA."))
   print(statement)
   }
 }
