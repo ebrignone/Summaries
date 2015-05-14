@@ -148,7 +148,5 @@ if (type=="ANOVA"){
     statement <- paste("Need to model the ANOVA using 'lm', not 'aov'.")
     return(statement)
   }
-  statement <- paste("Being Implemented")
-  return(statement)
   }
 }
