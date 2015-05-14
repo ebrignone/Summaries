@@ -125,7 +125,7 @@ if (type=="ANOVA"){
       m2[[i]] <-
         data.frame(
           "Adjusted Means"=Effect("Group", models[[i]])$fit, # Adjusted Means
-          "Effect Size (SD)"=as.numeric((m[[i]][,"Estimate"])/(summary(models[[i]])$coef[,2]/sqrt(as.numeric(summary(models[[i]][[7]])[1])+as.numeric(summary(models[[i]][[7]])[2])))),
+          "Effect Size (SD)"=as.numeric((m[[i]][,"Estimate"])/(summary(models[[i]])$coef[,2]*sqrt(as.numeric(summary(models[[i]][[7]])[1])+as.numeric(summary(models[[i]][[7]])[2])))),
           "names"=m[[i]]$names)
     }
     options(warn=-1)
