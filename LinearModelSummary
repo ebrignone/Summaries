@@ -111,7 +111,44 @@ if (type=="Log"){
   }
 # ANOVA/ANCOVA ---------------
 if (type=="ANOVA"){
+  require(effects)
+  m <- m2 <- rows <- pval <- modnames <- nameslist <- rsq <- list()
+  if (class(models[[1]])=="lm"){
+    for (i in 1:length(models)){
+      pval[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,4]) 
+      m[[i]] <- as.data.frame(summary(models[[i]])$coefficients[,1])
+      rows[[i]] <- dim(m[[i]])[1]
+      names(m[[i]]) <- "Estimate"
+    }
+    for (i in 1:length(m)){
+      m[[i]]$names <- rownames(m[[i]])
+      m2[[i]] <-
+        data.frame(
+          "Adjusted Means"=Effect("Group", models[[i]])$fit, # Adjusted Means
+          "Effect Size (SD)"=as.numeric((m[[i]][,"Estimate"])/(summary(models[[i]])$coef[,2]/sqrt(as.numeric(summary(models[[i]][[7]])[1])+as.numeric(summary(models[[i]][[7]])[2])))),
+          "names"=m[[i]]$names)
+    }
+    options(warn=-1)
+    # Reduce repeats the function provided over all the elements of m2
+    merged <- Reduce(function(...) merge(..., by="names", all=TRUE), m2)
+    for (i in 1:length(model.names)){
+      nameslist[[i]] <- cbind(model.names[[i]],"Effect Size")
+    }
+    nameslist <- unlist(nameslist)
+    names(merged) <- c("Variable",nameslist)
+    merged[,c(seq(3, length.out=length(model.names), by=2))] <- sapply(merged[,c(seq(3, length.out=length(model.names), by=2))], as.character)
+    merged[is.na(merged)] <- ""
+    # R Squared Effect Size
+    for (i in 1:length(m)){
+      rsq[[i]] <- summary(models[[i]])$r.squared
+    }
+    rsqStatement <- paste("The R Squared for", model.names, "is", rsq)
+    return(list("Table"=merged, "RSq"=rsqStatement))
+  } else {
+    statement <- paste("Need to model the ANOVA using 'lm', not 'aov'.")
+    return(statement)
+  }
   statement <- paste("Being Implemented")
-  print(statement)
+  return(statement)
   }
 }
