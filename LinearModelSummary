@@ -1,3 +1,16 @@
+# Title: modelSum
+# Author: Tyson Barrett
+# Description: The modelSum function performs a summary of multiple models (including linear regression, glm with logit and log links, and ANOVA)
+#   It summarizes much of the results in a way that can easily be copied and pasted into Latex (using xtable() from the xtable library)
+#   OLS -- it reports the estimates for the variables in the models and the MSE of each model
+#   GLM -- the estimates are transformed to Log Odds for logit and the Multiplier effect for log and their CI's
+#   ANOVA -- the estimate of the model (need to use lm()), the effect size in SD units, and reports the R squared
+
+# Should be beneficial for people like Grad Students who need to write up the report of the models they've run in a quick and informative way
+
+# ======================================================================
+#    --   modelSum   --
+# ======================================================================
 modelSum <- function(models, model.names, type="OLS"){
 # Not Supported Types ---------
   if (type!="OLS" & type!="Logit" & type!="Log" & type!="ANOVA") 
