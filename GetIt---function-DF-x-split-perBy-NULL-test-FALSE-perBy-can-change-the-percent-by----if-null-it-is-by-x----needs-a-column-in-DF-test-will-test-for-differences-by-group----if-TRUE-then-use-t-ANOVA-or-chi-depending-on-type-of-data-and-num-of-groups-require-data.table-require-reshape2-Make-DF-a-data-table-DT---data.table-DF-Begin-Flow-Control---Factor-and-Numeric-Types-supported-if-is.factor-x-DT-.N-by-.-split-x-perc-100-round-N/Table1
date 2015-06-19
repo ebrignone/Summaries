@@ -1,0 +1,21 @@
+GetIt <- function(DF, x, split, perBy=NULL, test=FALSE)
+{
+  # perBy can change the percent by -- if null, it is by x -- needs a column in DF
+  # test will test for differences by group -- if TRUE then use t, ANOVA or chi depending on type of data and num of groups
+  require(data.table)
+  require(reshape2)
+  # Make DF a data table
+  DT <- data.table(DF)
+  # Begin Flow Control - Factor and Numeric Types supported
+  if(is.factor(x))
+  {
+    DT[,.N,by=.(split,x)][,perc := 100*round(N/sum(N),4),by=.(x)][,entry :=paste(N,"(",perc,"%)",sep="")]
+  } else if (is.numeric(x)) {
+    
+    DT[,.(x="fill", Mean = round(mean(x, na.rm=TRUE),2), SD = round(sd(x, na.rm=TRUE),2)), by=.(split)][,entry := paste(Mean," (",SD,")",sep="")] 
+    
+  } else {
+      
+    stop("D'Oh! List contains unsupported data type.")
+  }
+}
