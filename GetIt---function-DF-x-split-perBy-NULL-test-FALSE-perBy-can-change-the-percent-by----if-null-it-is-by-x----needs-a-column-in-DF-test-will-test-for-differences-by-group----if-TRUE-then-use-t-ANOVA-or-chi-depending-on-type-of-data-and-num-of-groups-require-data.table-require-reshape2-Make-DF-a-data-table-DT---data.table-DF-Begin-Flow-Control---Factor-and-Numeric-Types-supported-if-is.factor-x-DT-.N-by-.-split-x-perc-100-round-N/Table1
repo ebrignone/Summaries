@@ -1,4 +1,4 @@
-#Format variables in mtcars to test funtion
+#Format variables in mtcars to test function
 mtcars$mpgbin <- as.factor(ifelse(mtcars$mpg > 20, ">20 mpg", "<=20 mpg"))
 mtcars$carb <- as.character(mtcars$carb)
 mtcars$cyl <- as.factor(mtcars$cyl)
